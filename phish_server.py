@@ -35,8 +35,11 @@ def send_simulation_email(subject, body):
 
 @app.route("/login", methods=["GET"])
 def show_login():
-    # Microsoft 365 styled login page
-    return render_template_string("""
+    # Get host and user from query string to preserve through POST
+    host = request.args.get("host", "Unknown")
+    user = request.args.get("user", "Unknown")
+    # Microsoft 365 styled login page with updated logo
+    return render_template_string(f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,24 +48,24 @@ def show_login():
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sign in to your account</title>
     <style>
-        body { margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f2f1; }
-        .main { display:flex; align-items:center; justify-content:center; height:100vh; }
-        .login-box { width:360px; background-color:#fff; padding:30px 40px; border:1px solid #c8c6c4; border-radius:4px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
-        .logo { display:block; margin:0 auto 20px; }
-        h1 { font-size:24px; font-weight:normal; color:#323130; text-align:center; margin:0 0 20px; }
-        input[type="email"] { width:100%; padding:10px; font-size:14px; border:1px solid #bebebe; border-radius:2px; margin-bottom:20px; }
-        input[type="submit"] { width:100%; padding:10px; font-size:16px; color:#fff; background-color:#0078d4; border:1px solid #0078d4; border-radius:2px; cursor:pointer; }
-        input[type="submit"]:hover { background-color:#005a9e; border-color:#005a9e; }
-        .footer { font-size:12px; color:#605e5c; text-align:center; margin-top:20px; }
-        .footer a { color:#0078d4; text-decoration:none; }
+        body {{ margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f2f1; }}
+        .main {{ display:flex; align-items:center; justify-content:center; height:100vh; }}
+        .login-box {{ width:360px; background-color:#fff; padding:30px 40px; border:1px solid #c8c6c4; border-radius:4px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }}
+        .logo {{ display:block; margin:0 auto 20px; }}
+        h1 {{ font-size:24px; font-weight:normal; color:#323130; text-align:center; margin:0 0 20px; }}
+        input[type="email"] {{ width:100%; padding:10px; font-size:14px; border:1px solid #bebebe; border-radius:2px; margin-bottom:20px; }}
+        input[type="submit"] {{ width:100%; padding:10px; font-size:16px; color:#fff; background-color:#0078d4; border:1px solid #0078d4; border-radius:2px; cursor:pointer; }}
+        input[type="submit"]:hover {{ background-color:#005a9e; border-color:#005a9e; }}
+        .footer {{ font-size:12px; color:#605e5c; text-align:center; margin-top:20px; }}
+        .footer a {{ color:#0078d4; text-decoration:none; }}
     </style>
 </head>
 <body>
     <div class="main">
         <div class="login-box">
-            <img class="logo" src="https://logincdn.msauth.net/shared/1.0/content/images/microsoft_login_logo.svg" alt="Microsoft logo" width="80" />
+            <img class="logo" src="https://www.pngfind.com/pngs/m/311-3118532_microsoft-logo-microsoft-logo-high-res-hd-png.png" alt="Microsoft logo" width="80" />
             <h1>Sign in to your account</h1>
-            <form method="POST" action="/login">
+            <form method="POST" action="/login?host={host}&user={user}">
                 <input type="email" name="email" placeholder="Email, phone, or Skype" required autofocus />
                 <input type="submit" value="Next" />
             </form>
