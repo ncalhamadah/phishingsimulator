@@ -8,7 +8,7 @@ app = Flask(__name__)
 # Mailtrap API Config
 MAILTRAP_API_TOKEN = "b80afb201f5235f81e13d2928b618006"
 FROM_EMAIL = "ithelpdesk@eden.ae"
-TO_EMAIL = "it@eden.ae"
+TO_EMAIL = "phishingcampaign@edenglobalinvestments.rmmservice.eu"
 
 def send_simulation_email(subject, body):
     api_url = "https://send.api.mailtrap.io/api/send"
@@ -149,3 +149,4 @@ def health_check():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
