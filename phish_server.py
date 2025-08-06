@@ -35,34 +35,47 @@ def send_simulation_email(subject, body):
 
 @app.route("/login", methods=["GET"])
 def show_login():
+    # Microsoft 365 styled login page
     return render_template_string("""
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sign in to your account</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f2f1; margin: 0; padding: 0; }
-        .container { max-width: 360px; margin: 100px auto; background: #fff; padding: 40px; border-radius: 4px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-        h2 { color: #0078d4; }
-        input[type="email"], input[type="submit"] { width: 100%; padding: 10px; margin-top: 10px; font-size: 16px; }
-        input[type="submit"] { background-color: #0078d4; color: white; border: none; cursor: pointer; }
-        input[type="submit"]:hover { background-color: #005a9e; }
-        .logo { margin-bottom: 20px; }
+        body { margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f2f1; }
+        .main { display:flex; align-items:center; justify-content:center; height:100vh; }
+        .login-box { width:360px; background-color:#fff; padding:30px 40px; border:1px solid #c8c6c4; border-radius:4px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
+        .logo { display:block; margin:0 auto 20px; }
+        h1 { font-size:24px; font-weight:normal; color:#323130; text-align:center; margin:0 0 20px; }
+        input[type="email"] { width:100%; padding:10px; font-size:14px; border:1px solid #bebebe; border-radius:2px; margin-bottom:20px; }
+        input[type="submit"] { width:100%; padding:10px; font-size:16px; color:#fff; background-color:#0078d4; border:1px solid #0078d4; border-radius:2px; cursor:pointer; }
+        input[type="submit"]:hover { background-color:#005a9e; border-color:#005a9e; }
+        .footer { font-size:12px; color:#605e5c; text-align:center; margin-top:20px; }
+        .footer a { color:#0078d4; text-decoration:none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <img class="logo" src="https://logincdn.msauth.net/shared/1.0/content/images/microsoft_logo_ee5c8f3fb6248c9712df.svg" alt="Microsoft" width="120">
-        <h2>Sign in</h2>
-        <form method="POST" action="/login">
-            <input type="email" name="email" placeholder="Email, phone, or Skype" required>
-            <input type="submit" value="Next">
-        </form>
+    <div class="main">
+        <div class="login-box">
+            <img class="logo" src="https://logincdn.msauth.net/shared/1.0/content/images/microsoft_login_logo.svg" alt="Microsoft logo" width="80" />
+            <h1>Sign in to your account</h1>
+            <form method="POST" action="/login">
+                <input type="email" name="email" placeholder="Email, phone, or Skype" required autofocus />
+                <input type="submit" value="Next" />
+            </form>
+            <div class="footer">
+                <p>Use your work or school account.</p>
+                <p><a href="https://support.microsoft.com/">Can't access your account?</a></p>
+            </div>
+        </div>
     </div>
 </body>
 </html>
-""")
+"""
+)
 
 @app.route("/login", methods=["POST"])
 def process_login():
@@ -73,7 +86,7 @@ def process_login():
     username = request.args.get("user", "Unknown")
     timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
 
-    # Try to get geolocation
+    # Geo IP lookup
     try:
         geo = requests.get(f"https://ipinfo.io/{ip}/json").json()
         location = f"{geo.get('city', 'Unknown')}, {geo.get('region', '')}, {geo.get('country', '')}"
@@ -98,28 +111,33 @@ Details:
 
 @app.route("/done", methods=["GET"])
 def show_thank_you():
+    # Professional awareness page
     return render_template_string("""
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Phishing Simulation Complete</title>
     <style>
-        body { font-family: Arial; text-align: center; background-color: #f4f6f9; padding-top: 100px; }
-        .card { background: white; display: inline-block; padding: 40px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-        h2 { color: #dc3545; }
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; }
+        .card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); text-align:center; width:420px; }
+        h2 { color: #323130; margin-bottom:20px; }
+        p { color: #605e5c; font-size:14px; margin:10px 0; }
+        a { color: #0078d4; text-decoration:none; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>This was a Phishing Simulation</h2>
-        <p>No credentials were stored.</p>
-        <pThis exercise is part of your organization’s security awareness training.</p>
-        <p>If you have concerns, contact IT.</p>
+        <p><strong>No credentials were stored.</strong></p>
+        <p>This exercise is part of your organization’s security awareness training.</p>
+        <p>If you have concerns, <a href="mailto:it@eden.ae">contact IT</a>.</p>
     </div>
 </body>
 </html>
-""")
+"""
+)
 
 @app.route("/", methods=["GET"])
 def health_check():
