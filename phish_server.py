@@ -1,21 +1,27 @@
 from flask import Flask, request
-import smtplib
-from email.message import EmailMessage
+import requests
 import os
 
 app = Flask(__name__)
 
-# Mailtrap SMTP Configuration (Update if you're using Microsoft SMTP)
-SMTP_SERVER = "live.smtp.mailtrap.io"
-SMTP_PORT = 587
-SMTP_USER = "api"
-SMTP_PASS = "fb46aa750cfdb994564a2208045c50ba"
-FROM_ADDRESS = "ithelpdesk@eden.ae"
-TO_ADDRESS = "it@eden.ae"  # 👈 Updated here
+# Mailtrap Email Sending API Configuration
+MAILTRAP_API_TOKEN = "b80afb201f5235f81e13d2928b618006"
+FROM_EMAIL = "ithelpdesk@eden.ae"
+TO_EMAIL = "it@eden.ae"
 
-def send_email_notification(hostname, ip, user_agent, extra=None):
-    subject = "Phishing Simulation: Link Clicked"
-    body = f"""
+def send_email_via_mailtrap_api(hostname, ip, user_agent, extra=None):
+    api_url = "https://send.api.mailtrap.io/api/send"
+
+    headers = {
+        "Authorization": f"Bearer {MAILTRAP_API_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "from": {"email": FROM_EMAIL},
+        "to": [{"email": TO_EMAIL}],
+        "subject": "Phishing Simulation: Link Clicked",
+        "text": f"""
 Phishing simulation link clicked!
 
 Details:
@@ -24,21 +30,16 @@ Details:
 - User-Agent: {user_agent}
 - Extra Info: {extra if extra else 'N/A'}
 """
-
-    msg = EmailMessage()
-    msg.set_content(body)
-    msg["Subject"] = subject
-    msg["From"] = FROM_ADDRESS
-    msg["To"] = TO_ADDRESS
+    }
 
     try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SMTP_USER, SMTP_PASS)
-            server.send_message(msg)
-            print("✅ Email sent to", TO_ADDRESS)
+        response = requests.post(api_url, headers=headers, json=data)
+        if response.status_code == 200:
+            print("✅ Email sent via Mailtrap API")
+        else:
+            print(f"❌ API Error {response.status_code}: {response.text}")
     except Exception as e:
-        print("❌ SMTP Error:", str(e))
+        print("❌ Request failed:", str(e))
 
 @app.route("/phish", methods=["GET"])
 def phishing_endpoint():
@@ -47,17 +48,15 @@ def phishing_endpoint():
     hostname = request.args.get("host", "Unknown")
     username = request.args.get("user", "Unknown")
 
-    print(f"🔔 Phishing click detected - Host: {hostname}, IP: {ip}, User: {username}, UA: {user_agent}")
-    send_email_notification(hostname, ip, user_agent, f"user={username}")
+    print(f"🔔 Phishing click - Host: {hostname}, IP: {ip}, User: {username}")
+    send_email_via_mailtrap_api(hostname, ip, user_agent, f"user={username}")
 
     return "<h3 style='color:red;'>Access Denied.</h3>", 403
 
-# Optional homepage route
 @app.route("/", methods=["GET"])
 def home():
     return "<h3>Phishing Simulation Backend is Running</h3>"
 
-# Auto-bind port for Render
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
