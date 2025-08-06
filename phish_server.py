@@ -1,16 +1,17 @@
 from flask import Flask, request
 import smtplib
 from email.message import EmailMessage
+import os
 
 app = Flask(__name__)
 
-# Mailtrap SMTP configuration
+# Mailtrap SMTP Configuration (Update if you're using Microsoft SMTP)
 SMTP_SERVER = "live.smtp.mailtrap.io"
 SMTP_PORT = 587
 SMTP_USER = "api"
 SMTP_PASS = "fb46aa750cfdb994564a2208045c50ba"
 FROM_ADDRESS = "ithelpdesk@eden.ae"
-TO_ADDRESS = "ithelpdesk.eden@edenglobalinvestments.rmmservice.eu"
+TO_ADDRESS = "it@eden.ae"  # 👈 Updated here
 
 def send_email_notification(hostname, ip, user_agent, extra=None):
     subject = "Phishing Simulation: Link Clicked"
@@ -35,9 +36,9 @@ Details:
             server.starttls()
             server.login(SMTP_USER, SMTP_PASS)
             server.send_message(msg)
-            print("Notification sent.")
+            print("✅ Email sent to", TO_ADDRESS)
     except Exception as e:
-        print("Failed to send email:", str(e))
+        print("❌ SMTP Error:", str(e))
 
 @app.route("/phish", methods=["GET"])
 def phishing_endpoint():
@@ -46,17 +47,17 @@ def phishing_endpoint():
     hostname = request.args.get("host", "Unknown")
     username = request.args.get("user", "Unknown")
 
-    # Log to console
-    print(f"Phishing click - Host: {hostname}, IP: {ip}, User: {username}, UA: {user_agent}")
-
-    # Send email alert
+    print(f"🔔 Phishing click detected - Host: {hostname}, IP: {ip}, User: {username}, UA: {user_agent}")
     send_email_notification(hostname, ip, user_agent, f"user={username}")
 
     return "<h3 style='color:red;'>Access Denied.</h3>", 403
 
+# Optional homepage route
+@app.route("/", methods=["GET"])
+def home():
+    return "<h3>Phishing Simulation Backend is Running</h3>"
+
+# Auto-bind port for Render
 if __name__ == "__main__":
-    import os
-port = int(os.environ.get("PORT", 10000))
-app.run(host="0.0.0.0", port=port)
-
-
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
